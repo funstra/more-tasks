@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>light</title>
+
+    <link rel="preload" href="./style.css" as="stylesheet">
+
+    <link rel="preload" href="./custom-elements/taks.js" as="script">
+    <link rel="preload" href="./custom-elements/input.js" as="script">
+
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+
+    <main style="opacity: 0;">
+        <app-input>
+        </app-input>
+        <p id="count">count: <span></span></p>
+        <div class="tasks">
+            <app-task name="cool" task="Dance"></app-task>
+        </div>
+    </main>
+
+
+
+
+    <template id="app-input">
+        <style>
+            :host {
+                display: block;
+                font-family: monospace;
+                color: #999;
+            }
+
+            :host>div {
+                border-radius: 0.5ch;
+                padding: 0.5ch;
+                display: flex;
+                border: 2px currentColor dashed;
+                gap: 1rem;
+            }
+
+            :host>div>div {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5ch;
+            }
+
+            :host>div>div {
+                flex-grow: 1;
+            }
+
+            :host>div>div>div {
+                display: flex;
+            }
+
+            input {
+                flex-grow: 1;
+                color: inherit;
+                border-width: 1px;
+                border-style: solid;
+                border-color: currentColor;
+            }
+
+            button {
+                color: inherit;
+                border-width: 1px;
+                border-style: solid;
+                border-color: currentColor;
+                background-color: transparent;
+                border-radius: 0.5ch;
+
+                transition: background-color 175ms, filter 75ms;
+            }
+
+            button:hover {
+                background-color: white;
+                filter: invert(1);
+            }
+        </style>
+        <div>
+            <div>
+                <div>
+                    <label for="input-name">name: </label>
+                    <input id="input-name" type="text">
+                </div>
+                <div>
+                    <label for="input-task">task: </label>
+                    <input id="input-task" type="text">
+                </div>
+            </div>
+            <button>add</button>
+        </div>
+    </template>
+    <template id="app-task">
+        <style>
+            :host {
+                display: block;
+                max-width: 50ch;
+                font-family: monospace;
+            }
+
+            p {
+                margin: 0;
+            }
+
+            :host>div {
+                border: 2px black dashed;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0.5rem;
+            }
+        </style>
+        <div>
+            <div class="info">
+                <p type="name">Name: <span></span></p>
+                <p type="task">Task: <span></span></p>
+            </div>
+            <div>
+                <button>x</button>
+            </div>
+        </div>
+    </template>
+
+
+    <script>
+        let count = 0
+        document.body.addEventListener('app-task:task', e => {
+            switch (e.detail.action) {
+                case 'remove':
+                    count--
+                    document.querySelector('#count span').textContent = count
+                    break
+                case 'added':
+                    count++
+                    document.querySelector('#count span').textContent = count
+                    var tasks = document.querySelector('.tasks')
+                    if (tasks.scrollHeight > tasks.offsetHeight) {
+                        tasks.classList.add('inset-bottom')
+                    }
+                    break
+                case 'add':
+                    const task = document.createElement('app-task')
+                    task.setAttribute('name', e.detail.data.name)
+                    task.setAttribute('task', e.detail.data.task)
+                    document.querySelector('.tasks').appendChild(task)
+            }
+        })
+
+
+
+
+
+
+        document.querySelector('.tasks').onscroll = e => {
+            if ((e.target.offsetHeight + e.target.scrollTop + 32) >= e.target.scrollHeight) {
+                e.target.classList.add('inset-top')
+                e.target.classList.remove('inset-bottom')
+            } else if (e.target.scrollTop > 16) {
+            } else {
+                e.target.classList.remove('inset-top')
+                e.target.classList.add('inset-bottom')
+            }
+        }
+
+    </script>
+
+    <script type="module">
+        import './custom-elements/taks.js'
+        import './custom-elements/input.js'
+        window.onload = e => {
+            document.querySelector('main').style.transition = 'opacity 75ms'
+            document.querySelector('main').style.opacity = 1
+        }
+    </script>
+
+</body>
+
+</html>
